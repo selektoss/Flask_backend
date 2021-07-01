@@ -12,8 +12,6 @@ from sqlalchemy.sql.expression import and_, or_
 db = SQLAlchemy()
 
 
-
-################################# Enum class ###################################################
 class StateUser(Enum):
     ACTIVE = True
     INACTIVE = False
@@ -37,7 +35,7 @@ class Nationality(Enum):
     FOREIGN = "Foreign"
     RF = "Russia"
 
-################################# Link table global field ######################################
+
 doctor_specialization = db.Table('doctor_specialization',
     db.Column('doctor_id', db.Integer, db.ForeignKey('doctors.doctor_id', 
         name='fk__doctor_id.>>>.doctors.doctor_id', ondelete="CASCADE", onupdate="RESTRICT"), 
@@ -58,7 +56,6 @@ favorites_doctors = db.Table('favorites_doctors',
 
 class AuthenticationData(db.Model):
 
-################################# Class attribute ##############################################
     data_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     emailadress = db.Column(db.String(100), nullable=False, unique=True)
     __password = db.Column("password", db.String(100), nullable=False)
@@ -67,15 +64,14 @@ class AuthenticationData(db.Model):
     update_at = db.Column(db.DateTime, onupdate=datetime.utcnow, nullable=True)
     role_type = db.Column(db.Enum(RoleUsers), nullable=False, default="PATIENT")
 
-################################# Relationship #################################################
     users = db.relationship('User', backref=backref('auth_data', uselist=False))
 
-################################# Table properties #############################################
+
     __tablename__ = 'authenticate_data'
     __mapper_args__ = {'polymorphic_identity':'authenticate_data'}
     __table_args__ = {'mysql_row_format': 'COMPRESSED'}
 
-################################# Class Methods ################################################
+
     @classmethod
     def check_token(self, key):
         
@@ -91,11 +87,11 @@ class AuthenticationData(db.Model):
         elif password: raise Exception('User not exists')
         return user_data 
 
-################################# Get, Set Methods #############################################
+
     @property
     def get_token(self)-> str: return self.__token_save
 
-################################# Object Methods ###############################################
+
     def __init__(self, kwargs) -> None:       
         super().__init__()
         self.emailadress = kwargs.get("emailadress")
@@ -111,12 +107,10 @@ class AuthenticationData(db.Model):
 
 class User(AuthenticationData):
 
-################################# ForeignKey ##################################################
     user_data_id = db.Column(db.Integer, db.ForeignKey(
         'authenticate_data.data_id', name="fk__users.user_data_id_>>>_authenticate_data.data_id", 
         ondelete="CASCADE", onupdate="RESTRICT"), primary_key=True)   
 
-################################# Class attribute ############################################## 
     gender = db.Column(db.Enum(Gender),nullable=False)
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=True)
@@ -126,19 +120,18 @@ class User(AuthenticationData):
     profile_pic = db.Column(db.String(50), nullable=True, default="/profile_pic/no_pic.jpg")
     is_state = db.Column(db.Enum(StateUser), nullable=False, default="ACTIVE")
 
-################################# Relationship #################################################
+
     doctors = db.relationship('Doctor', backref=backref('user_data', uselist=False), 
         foreign_keys="Doctor.doctor_id")
     patients = db.relationship('Patient', backref=backref('user_data', uselist=False), 
         foreign_keys="Patient.patient_id")
 
-################################# Table properties #############################################
     __tablename__ = 'users'   
     __mapper_args__ = {'polymorphic_identity':'users'}
     __table_args__ = (db.Index('firstname_lastname', "firstname", "lastname", unique=False),
         {'mysql_row_format': 'COMPRESSED'}) 
 
-################################# Object Methods ###############################################
+
     def __init__(self, kwargs) -> None:       
         super().__init__(kwargs.get("auth_data"))
         del kwargs["auth_data"]      
@@ -162,12 +155,11 @@ class User(AuthenticationData):
     
 class Shedule(db.Model):
 
-################################# ForeignKey ##################################################
     doctor_id_s = db.Column(
         db.Integer, db.ForeignKey('doctors.doctor_id', name='fk__doctor_id_s.>>>.doctors.doctor_id',
         ondelete="CASCADE", onupdate="RESTRICT"), primary_key=True)
 
-################################# Class attribute ##############################################
+
     monday_start = db.Column(db.Time(), nullable=True)
     monday_end = db.Column(db.Time(), nullable=True)
     tuesday_start = db.Column(db.Time(), nullable=True)
@@ -180,12 +172,10 @@ class Shedule(db.Model):
     friday_end = db.Column(db.Time(), nullable=True)
     time_step = db.Column(db.SmallInteger, default=30)
 
-################################# Table properties #############################################
     __tablename__ = "shedules"
     __table_args__ = {'mysql_row_format': 'COMPRESSED'}
     __mapper_args__ = {'polymorphic_identity':'shedules'}
     
-################################# Object Methods ###############################################
     def __init__(self, kwargs) -> None:
         super().__init__(**kwargs)
 
@@ -202,20 +192,16 @@ class Shedule(db.Model):
 
 class Specialization(db.Model):
 
-################################# Class attribute ##############################################
     spec_id = db.Column(db.String(14), primary_key=True)
     name_spec = db.Column(db.String(200), nullable=False, unique=True)
 
-################################# Relationship #################################################
     doctors = db.relationship('Doctor', secondary=doctor_specialization,
         back_populates='specializ', lazy=True)
 
-################################# Table properties #############################################
     __tablename__ = "specializations"
     __table_args__ = {'mysql_row_format': 'COMPRESSED'}
     __mapper_args__ = {'polymorphic_identity':'specializations'}
 
-################################# Class Methods ################################################
     @classmethod
     def get_list(self):
         try:
@@ -241,7 +227,6 @@ class Specialization(db.Model):
             raise Exception(err_sql)
         return special
 
-################################# Object Methods ###############################################
     def __init__(self, **kwargs) -> None:
         super().__init__()
         self.spec_id = kwargs.get('spec_id')
@@ -253,7 +238,6 @@ class Specialization(db.Model):
 
 class Doctor(User):
 
-################################# ForeignKey ##################################################
     doctor_id = db.Column(
         db.Integer, db.ForeignKey('users.user_data_id', name='fk__doctor_id.>>>.users.user_data_id',
         ondelete="CASCADE", onupdate="RESTRICT"), primary_key=True)
@@ -264,30 +248,26 @@ class Doctor(User):
         db.Integer, db.ForeignKey('clinics.clinic_id', name='fk__clinic.>>>.clinics.clinic_id',
         ondelete="RESTRICT", onupdate="RESTRICT"), nullable=False)
 
-################################# Class attribute ##############################################
     description = db.Column(db.Text, nullable=True)
     experience = db.Column(db.Integer, nullable=False)
     education = db.Column(db.String(500), nullable=False)
     __approved_status = db.Column("approved_status", db.Boolean, default=0, nullable=False)
     __count_patient = db.Column("count_patient", db.Integer, nullable=False, default=0)
 
-################################# Relationship #################################################
     specializ = db.relationship('Specialization', secondary=doctor_specialization, back_populates='doctors', lazy=True)
     favor_doctor = db.relationship('Patient', secondary=favorites_doctors, back_populates='doctors_favor', lazy=True)
     shedule_doctor = db.relationship('Shedule', backref=backref('doctor', uselist=False))
     place_work = db.relationship('PlaceWork', backref=backref('doctor_place', uselist=False))
     clinic_work = db.relationship('Clinic', backref=backref('doctor_clinic', uselist=False))
     appoint_dd = db.relationship('Appointment', backref=backref('doctor_appoints', uselist=True))
-################################# Table properties #############################################
+
     __tablename__ = "doctors"
     __table_args__ = {'mysql_row_format': 'COMPRESSED'}
     __mapper_args__ = {'polymorphic_identity':'doctors'}
 
-################################# Get, Set Methods #############################################
     @property
     def get_count_patient(self)-> int: return self.__count_patient
 
-################################# Class Methods ################################################
     @classmethod
     def get_list(self, kwargs):
         if(kwargs): 
@@ -343,9 +323,6 @@ class Doctor(User):
         db.session.commit()           
         return doctor
 
-    
-
-################################# Object Methods ###############################################
     def __init__(self, kwargs) -> None:        
         super().__init__(kwargs.get("user_data"))
         del kwargs["user_data"]
@@ -366,21 +343,19 @@ class Doctor(User):
                 raise Exception ("The time for making an appointment is already taken")
                 
             
-
-
 class PlaceWork(db.Model):
     __tablename__ = "places"
     
     id_place = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name_city = db.Column(db.String(200), nullable=False, unique=True)
     
-
     __table_args__ = {'mysql_row_format': 'COMPRESSED'}
     __mapper_args__ = {'polymorphic_identity':'places'}
 
     def __repr__(self):
         return self.name_city
-    
+
+
     def __init__(self, kwargs) -> None:        
         super().__init__(**kwargs)
 
@@ -388,6 +363,7 @@ class PlaceWork(db.Model):
     def save(self) -> None: 
         db.session.add(self)
         db.session.commit()
+
 
     @classmethod
     def get_place(self, place_id)->int:
@@ -399,6 +375,7 @@ class PlaceWork(db.Model):
             raise Exception(err_sql)
         return place_id
     
+
     @classmethod
     def get_list(self):
         try:
@@ -411,13 +388,13 @@ class PlaceWork(db.Model):
         
         return places
 
+
     @classmethod
     def get_place_name(self, name)->int:
         return self.query.filter(self.name_city == name).one_or_none()
 
 
 class Patient(User):
-
 
     patient_id = db.Column(
         db.Integer, db.ForeignKey('users.user_data_id', name='fk__patient_ids.>>>.users.user_data_id',
@@ -436,12 +413,13 @@ class Patient(User):
         del kwargs["user_data"]
         self.сitizenship = kwargs.get('сitizenship')
 
+
     def save(self) -> None: self._save_user()  
+
 
     @classmethod
     def get_patient(self, key):
         return self.check_token(key)
-
 
 
 class Appointment(db.Model):
@@ -468,6 +446,7 @@ class Appointment(db.Model):
 
     def __init__(self, kwargs) -> None:
         super().__init__(**kwargs)
+
 
     @classmethod
     def get_patient_list_appointment(self, patient_id):
@@ -501,6 +480,7 @@ class Appointment(db.Model):
             db.session.rollback()
             raise Exception(err_sql)
 
+
     def update(self, kwargs):
         try:
             print(kwargs)
@@ -511,6 +491,7 @@ class Appointment(db.Model):
         except Exception:
             db.session.rollback()
             raise Exception("Error update")
+
 
     def delete(self):
         try:
@@ -548,7 +529,6 @@ class Clinic(db.Model):
             raise Exception(err_sql)
         return clinic_id
     
-    
 
     @classmethod
     def get_list(self):
@@ -558,12 +538,14 @@ class Clinic(db.Model):
         except exc.NoResultFound as err_sql:
             db.session.rollback()
             db.session.close()
-            raise Exception(err_sql)
-        
+            raise Exception(err_sql) 
         return clinic
+
+
     def save(self) -> None: 
         db.session.add(self)
         db.session.commit()
+
 
     def __init__(self, kwargs) -> None:        
         super().__init__(**kwargs)
