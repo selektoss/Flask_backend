@@ -1,2 +1,14 @@
 /.vscode
 /env
+medic/__pycache__/__init__.cpython-38.pyc
+medic/__pycache__/const.cpython-38.pyc
+medic/__pycache__/model_schema.cpython-38.pyc
+medic/__pycache__/models.cpython-38.pyc
+medic/__pycache__/route.cpython-38.pyc
+medic/__pycache__/settings.cpython-38.pyc
+medic/controller_resource/__pycache__/__init__.cpython-38.pyc
+medic/controller_resource/__pycache__/appointment.cpython-38.pyc
+medic/controller_resource/__pycache__/base.cpython-38.pyc
+medic/controller_resource/__pycache__/doctors.cpython-38.pyc
+medic/controller_resource/__pycache__/feature.cpython-38.pyc
+medic/controller_resource/__pycache__/register.cpython-38.pyc
