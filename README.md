@@ -8,8 +8,15 @@ $ source .venv/bin/activate
 
 $ pip install -r requirements.txt
 
+$ FLASK_APP="migrate" flask db init
 
-# settings.py
+$ FLASK_APP="migrate" flask db migrate
+
+$ FLASK_APP="migrate" flask db upgrade
+
+$ python3 run.py
+
+# medic/settings.py
 
 class Config:
     

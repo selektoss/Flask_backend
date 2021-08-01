@@ -1,5 +1,8 @@
 /.vscode
 /.venv
+__pycache__/
+migrations/
 medic/__pycache__/
 medic/controller_resource/__pycache__/
 medic/settings.py
+log/api.log

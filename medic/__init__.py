@@ -1,18 +1,15 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from medic.settings import Config
 import logging
+from medic.models import db
 
 def create_app():
     medic_app = Flask(__name__)
     medic_app.config.from_object(Config)
-    
-    db = SQLAlchemy(medic_app)
-
     from medic.route import api_bp
     medic_app.register_blueprint(api_bp, url_prefix='/api/v1')
-    
     db.init_app(medic_app)
+    
     return medic_app
 
 

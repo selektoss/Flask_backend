@@ -1,12 +1,11 @@
-from passlib.hash import bcrypt
 from flask_sqlalchemy import SQLAlchemy
+from passlib.hash import bcrypt
 from sqlalchemy.orm import backref, exc
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 from enum import Enum
 import uuid
 import secrets
-
 from sqlalchemy.sql.expression import and_, or_
 
 db = SQLAlchemy()
