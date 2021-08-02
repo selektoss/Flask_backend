@@ -1,12 +1,14 @@
 # Flask_backend medic
 
-Python 3.8.10
+Python 3.9.6
 
-$ python3 -m venv .venv
+sudo apt-get install libmysqlclient-dev
+
+$ python3.9 -m venv .venv
 
 $ source .venv/bin/activate
 
-$ pip install -r requirements.txt
+$ pip3 install -r requirements.txt
 
 $ FLASK_APP="migrate" flask db init
 
@@ -14,7 +16,7 @@ $ FLASK_APP="migrate" flask db migrate
 
 $ FLASK_APP="migrate" flask db upgrade
 
-$ python3 run.py
+$ python3.9 run.py
 
 # medic/settings.py
 
